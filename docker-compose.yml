@@ -1,0 +1,29 @@
+version: '3.4'
+
+services:
+  mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_DATABASE: shortlist
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD-rootPassword}
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+  
+  server:
+    image: server
+    build: ./server
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL-info}
+      DB_URL: mongodb:27017
+      DB_NAME: shortlist
+      DB_USER: ${DB_USER-root}
+      DB_PASSWORD: ${DB_PASSWORD-rootPassword}
+      PORT: 4000
+    ports:
+      - 4000:4000
+
+volumes:
+  mongodb_data_container:
