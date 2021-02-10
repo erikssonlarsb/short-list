@@ -1,17 +1,19 @@
 const log4js = require('log4js');
-const env = require('../environment');
-const PositionDataAdapter = require('../adapters/positionDataAdapter');
-const InstrumentDataAdapter = require('../adapters/instrumentDataAdapter');
-const PriceDataAdapter = require('../adapters/priceDataAdapter');
-const PartyFactory = require('../factories/partyFactory');
-const InstrumentFactory = require('../factories/instrumentFactory');
-const priceFactory = require('../factories/priceFactory');
-const positionFactory = require('../factories/positionFactory');
+const env = require('../../environment');
+const PositionDataAdapter = require('../../adapters/positionDataAdapter');
+const InstrumentDataAdapter = require('../../adapters/instrumentDataAdapter');
+const PriceDataAdapter = require('../../adapters/priceDataAdapter');
+const PartyFactory = require('../../factories/partyFactory');
+const InstrumentFactory = require('../../factories/instrumentFactory');
+const priceFactory = require('../../factories/priceFactory');
+const positionFactory = require('../../factories/positionFactory');
 
 var logger = log4js.getLogger('download positions');
 logger.level = env.logLevel;
 
 exports.run = async function(historic=false) {
+
+  logger.info("Started downloading positions data...");
 
   let positionsData = await PositionDataAdapter.fetchData(historic=historic);
 
