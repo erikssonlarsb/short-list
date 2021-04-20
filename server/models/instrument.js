@@ -5,7 +5,10 @@ const instrumentIdentifierSchema = new mongoose.Schema({
     type: {type: String, required: true}
 });
 
-instrumentIdentifierSchema.index({id: 1, type: 1}, {unique: true});
+instrumentIdentifierSchema.set('toJSON', {transform: function(doc, ret) {
+    delete ret._id;
+    return ret;
+}});
 
 const instrumentSchema = new mongoose.Schema({
     name: {type: String},
@@ -13,6 +16,8 @@ const instrumentSchema = new mongoose.Schema({
     status: {type: String, enum: ['Active', 'Delisted', 'Unknown'], default: 'Unknown'},
     identifiers: [instrumentIdentifierSchema]
 });
+
+instrumentSchema.plugin(require('./plugins/toJSONTransform'));
 
 module.exports = mongoose.model('Instrument', instrumentSchema);
 

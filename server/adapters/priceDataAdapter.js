@@ -1,10 +1,8 @@
 const log4js = require('log4js');
+const logger = log4js.getLogger(require("path").basename(__filename, '.js'));
 const fetch = require('node-fetch');
-const env = require('../environment');
-
 const baseUrl = 'http://www.nasdaqomxnordic.com/webproxy/DataFeedProxy.aspx?';
-var logger = log4js.getLogger('priceDataAdapter');
-logger.level = env.logLevel;
+
 
 class PriceData {
     constructor(data) {

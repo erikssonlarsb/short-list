@@ -5,7 +5,7 @@ module.exports = {
     // Query instruments
     query: function(queryParams, {populate = [], sort = null, limit = null} = {}, callback) {
         if (typeof arguments[1] === 'function') callback = arguments[1];
-
+        
         return Instrument.find(queryParams)
         .populate(populate)
         .sort(sort)

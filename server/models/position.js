@@ -8,5 +8,7 @@ const positionSchema = new mongoose.Schema({
 });
 positionSchema.index({instrument: 1, holder: 1, date: 1}, {unique: true});
 
+positionSchema.plugin(require('./plugins/toJSONTransform'));
+
 module.exports = mongoose.model('Position', positionSchema);
 

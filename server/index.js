@@ -1,12 +1,11 @@
-const log4js = require('log4js');
-const express = require('express');
-const mongoose = require('mongoose');
 const env = require('./environment');
-const scheduler = require('./tasks/scheduler');
+const log4js = require('log4js');
+log4js.configure(require('./logging/config'));
 
-var logger = log4js.getLogger('startup');
-logger.level = env.logLevel;
-var app = express();
+const mongoose = require('mongoose');
+const scheduler = require('./tasks/scheduler');
+const api = require('./api/api');
+const logger = log4js.getLogger('startup');
 
 async function init() {
   // Server initialization with retry if mongodb connection fails
@@ -26,19 +25,21 @@ async function init() {
         pass: env.dbPassword
       }
     );
-
-    logger.info("Connected to database, proceeding...");
-    scheduler.init();
+    logger.info("Running initial download of positions...");
     await require('./tasks/scripts/downloadPositions').run(historic=false);
-  
+
+    logger.info("Scheduling tasks...");
+    scheduler.init();
+
     logger.info("Enabling API...");
-    app.listen(env.serverPort);
+    api.init();
+    
     logger.info("Startup sequence complete!");
 
   } catch(e) {
-    logger.warn("Failed to initialize server, ", e);
+    logger.error("Failed to initialize server, ", e);
     logger.info("Retrying in 5 seconds...")
-    await setTimeout(await init, 5000);
+    setTimeout(await init, 5000);
   }
 }
 

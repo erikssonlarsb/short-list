@@ -5,5 +5,7 @@ const partySchema = new mongoose.Schema({
     roles: {type: [String], enum: ['Holder', 'Issuer'], validate: v => Array.isArray(v) && v.length > 0}
 });
 
+partySchema.plugin(require('./plugins/toJSONTransform'));
+
 module.exports = mongoose.model('Party', partySchema);
 

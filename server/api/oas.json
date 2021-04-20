@@ -1,0 +1,1102 @@
+{
+    "openapi": "3.0.0",
+    "info":{
+        "title": "short-list API",
+        "description": "REST API wrapper for the short position data published by Finansinspektionen (the Swedish financial supervisory authority)",
+        "version": "0.2"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000",
+            "description": "Local dev environment"
+        },
+        {
+            "url": "http://localhost:4000",
+            "description": "Local docker environment"
+        }
+    ],
+    "paths": {
+        "/instruments": {
+            "get": {
+                "summary": "Query instruments",
+                "description": "Returns a list of instruments matching the provided search criteria",
+                "tags": ["Instruments"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Instrument"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Id of the instrument",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Name of the instrument",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "issuer",
+                        "in": "query",
+                        "description": "Id of the issuer",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "objectid"
+                            }
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status of the instrument",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["Active", "Delisted", "Unknown"]
+                            }
+                        }
+                    },
+                    {
+                        "name": "identifiers",
+                        "in": "query",
+                        "description": "Any global identifier",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "description": "Identifier"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "description": "Type of global identifier"
+                                    }
+                                }
+                            }
+                        },
+                        "examples": {
+                            "none": {
+                                "summary": "-",
+                                "value": null
+                            },
+                            "queryOnIdentifiers": {
+                                "summary": "Query on identifiers",
+                                "value": [
+                                    {
+                                        "id": "SE0000379190",
+                                        "type": "Isin"
+                                    },
+                                    {
+                                        "id": "SSE81",
+                                        "type": "NasdaqId"
+                                    }
+                                ]
+                            }
+                        } 
+                    },
+                    {
+                        "name": "$populate",
+                        "in": "query",
+                        "description": "Metadata describing which referenced document(s) on the response objects that should be populated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PopulateQueryParam"
+                                },
+                                "example": ["issuer"]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "/instruments/{id}": {
+            "get": {
+                "summary": "Find an instrument by id",
+                "description": "Returns instrument with the specified id",
+                "tags": ["Instruments"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Instrument"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of the instrument",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "$populate",
+                        "in": "query",
+                        "description": "Metadata describing which referenced document(s) on the response objects that should be populated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PopulateQueryParam"
+                                },
+                                "example": ["issuer"]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "/logs": {
+            "get": {
+                "summary": "Query logs",
+                "description": "Returns a list log records matching the provided search critera",
+                "tags": ["Logs"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Log"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Id of the log record",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "message",
+                        "in": "query",
+                        "description": "The log message",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "level",
+                        "in": "query",
+                        "description": "The level of the log record",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"]
+                            }
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "The category/source of the log record",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "time",
+                        "in": "query",
+                        "description": "Time when the log was recorded",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "/logs/{id}": {
+            "get": {
+                "summary": "Find a log record by id",
+                "description": "Returns log record with the specified id",
+                "tags": ["Logs"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Log"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of the log record",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ]
+            }
+        },
+        "/parties": {
+            "get": {
+                "summary": "Query parties",
+                "description": "Returns a list of parties matching the provided search criteria",
+                "tags": ["Parties"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Party"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Id of the party",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Name of the party",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "roles",
+                        "in": "query",
+                        "description": "The type of role(s) that he party acts as",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["Holder", "Issuer"]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "/parties/{id}": {
+            "get": {
+                "summary": "Find a party by id",
+                "description": "Returns party with the specified id",
+                "tags": ["Parties"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Party"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of the party",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ]
+            }
+        },
+        "/positions": {
+            "get": {
+                "summary": "Query positions",
+                "description": "Returns a list of positions matching the providewd search criteria",
+                "tags": ["Positions"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Position"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Id of the position",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "instrument",
+                        "in": "query",
+                        "description": "Instrument of the position",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "objectid"
+                            }
+                        }
+                    },
+                    {
+                        "name": "holder",
+                        "in": "query",
+                        "description": "Id of the holder",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "objectid"
+                            }
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Date of the position",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "date"
+                            }
+                        }
+                    },
+                    {
+                        "name": "value",
+                        "in": "query",
+                        "description": "Position value",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    {
+                        "name": "$populate",
+                        "in": "query",
+                        "description": "Metadata describing which referenced documents on the response objects that should be populated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PopulateQueryParam"
+                                },
+                                "example": [
+                                    {
+                                        "path": "holder"
+                                    },
+                                    {
+                                        "path": "instrument",
+                                        "populate": {"path": "issuer"}
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "/positions/{id}": {
+            "get": {
+                "summary": "Find a position by id",
+                "description": "Returns position with the specified id",
+                "tags": ["Positions"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Position"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of the position",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "$populate",
+                        "in": "query",
+                        "description": "Metadata describing which referenced documents on the response objects that should be populated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PopulateQueryParam"
+                                },
+                                "example": [
+                                    {
+                                        "path": "holder"
+                                    },
+                                    {
+                                        "path": "instrument",
+                                        "populate": {"path": "issuer"}
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "/prices": {
+            "get": {
+                "summary": "Query prices",
+                "description": "Returns a list of prices matching the provided search criteria",
+                "tags": ["Prices"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Price"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Id of the price",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "value",
+                        "in": "query",
+                        "description": "Value of the price",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Type of the price",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["Close"]
+                            }
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Date of the price",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "date"
+                            }
+                        }
+                    },
+                    {
+                        "name": "instrument",
+                        "in": "query",
+                        "description": "Instrument of the price",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "objectid"
+                            }
+                        }
+                    },
+                    {
+                        "name": "$populate",
+                        "in": "query",
+                        "description": "Metadata describing which referenced documents on the response objects that should be populated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PopulateQueryParam"
+                                },
+                                "example": {
+                                    "path": "instrument",
+                                    "populate": {
+                                        "path": "issuer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "/prices/{id}": {
+            "get": {
+                "summary": "Find a price by id",
+                "description": "Returns price with the specified id",
+                "tags": ["Prices"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Price"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of the price",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "$populate",
+                        "in": "query",
+                        "description": "Metadata describing which referenced documents on the response objects that should be populated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PopulateQueryParam"
+                                },
+                                "example": {
+                                    "path": "instrument",
+                                    "populate": {
+                                        "path": "issuer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "responses": {
+            "BadRequest": {
+                "description": "Bad Request",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "Not Found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "InternalServerError": {
+                "description": "Internal Server Error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "Error": {
+                "description": "Error response body representing some kind of server-side error. ",
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "description": "Description of the error",
+                        "type": "string"
+                    },
+                    "code": {
+                        "description": "Code representing the error, may or may not be an HTTP status code",
+                        "oneOf": [
+                            {"type": "number"},
+                            {"type": "string"}
+                        ]
+                    },
+                    "type": {
+                        "description": "The type/category of the error",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "message": "Unknown parser error",
+                    "code": "445566",
+                    "type": "Serialization error"
+                }
+            },
+            "Instrument": {
+                "description": "A financial instrument",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "Id of the instrument",
+                        "type": "string",
+                        "format": "objectid"
+                    },
+                    "name": {
+                        "description": "Name of the instrument",
+                        "type": "string"
+                    },
+                    "issuer": {
+                        "description": "Legal entity that has issued the financial instrument",
+                        "type": "object",
+                        "oneOf": [
+                            {"$ref": "#/components/schemas/Reference"},
+                            {"$ref": "#/components/schemas/Party"}
+                        ]
+                    },
+                    "status": {
+                        "description": "Status of the instrument",
+                        "type": "string",
+                        "enum": ["Active", "Delisted", "Unknown"]
+                    },
+                    "identifiers": {
+                        "description": "External identifiers used for the instrument",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "description": "External id",
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "description": "Type of external identifier",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["id", "type"]
+                        }
+                    }
+                },
+                "required": ["issuer"],
+                "example": {
+                    "status": "Active",
+                    "name": "Castellum",
+                    "issuer": {
+                        "id": "6041563aa1985b38dc6445b5",
+                        "type": "Party"
+                    },
+                    "identifiers": [
+                        {
+                            "id": "SE0000379190",
+                            "type": "Isin"
+                        },
+                        {
+                            "id": "SSE966",
+                            "type": "NasdaqId"
+                        }
+                    ],
+                    "id": "6041563ba1985b38dc6445b6"
+                }
+            },
+            "Log": {
+                "description": "A log record ",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "Id of the log record",
+                        "type": "string",
+                        "format": "objectid"
+                    },
+                    "message": {
+                        "description": "The log message",
+                        "type": "string"
+                    },
+                    "level": {
+                        "description": "The level of the log record",
+                        "type": "string",
+                        "enum": ["TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"]
+                    },
+                    "category": {
+                        "description": "The category/source of the log record",
+                        "type": "string"
+                    },
+                    "time": {
+                        "description": "Time when the log was recorded",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "example": {
+                    "id": "607ecf9ce9c86d49000a78c7",
+                    "message": "Connecting to database...",
+                    "level": "INFO",
+                    "category": "startup",
+                    "time": "2021-04-20T12:57:00.303Z"
+                }
+            },
+            "Party": {
+                "description": "A legal entity engaging in the trade of financial instruments",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "Id of the party",
+                        "type": "string",
+                        "format": "objectid"
+                    },
+                    "name": {
+                        "description": "Name of the party",
+                        "type": "string"
+                    },
+                    "roles": {
+                        "description": "The type of role(s) that he party acts as",
+                        "type" :"array",
+                        "items": {
+                            "type": "string",
+                            "enum": ["Holder", "Issuer"]
+                        }
+                    }
+                },
+                "example": {
+                    "roles": [
+                        "Issuer"
+                    ],
+                    "name": "Castellum Aktiebolag",
+                    "id": "6041563aa1985b38dc6445b5"
+                  }
+            },
+            "PopulateObject": {
+                "description": "Describes the population of referenced documents and sub-documents",
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "description": "Name of the field to populate",
+                        "type": "string"
+                    },
+                    "populate": {
+                        "description": "Recursive JSON object outlining population of sub-references",
+                        "oneOf": [{
+                            "$ref": "#/components/schemas/PopulateObject"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/PopulateObject"
+                            }
+                        }]
+                    }
+                },
+                "required": ["path"]
+            },
+            "PopulateQueryParam": {
+                "type": "object",
+                "oneOf": [
+                    {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                    },
+                    {
+                        "$ref":  "#/components/schemas/PopulateObject"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "$ref":  "#/components/schemas/PopulateObject"
+                        }
+                    }
+                ]
+            },
+            "Position": {
+                "type":"object",
+                "properties": {
+                    "id": {
+                        "description": "Id of the position",
+                        "type": "string",
+                        "format": "objectid"
+                    },
+                    "instrument": {
+                        "type": "object",
+                        "oneOf": [
+                            {"$ref": "#/components/schemas/Reference"},
+                            {"$ref": "#/components/schemas/Instrument"}
+                        ]
+                    },
+                    "holder": {
+                        "description": "Legal entity that holds the position",
+                        "type": "object",
+                        "oneOf": [
+                            {"$ref": "#/components/schemas/Reference"},
+                            {"$ref": "#/components/schemas/Party"}
+                        ]
+                    },
+                    "date": {
+                        "description": "Date of the position",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "value": {
+                        "description": "Percentage of the issued shares that the holder has shorted",
+                        "type": "number"
+                    }
+                },
+                "example": {
+                    "holder": {
+                        "id": "6041563ba1985b38dc6445b9",
+                        "type": "Party"
+                    },
+                    "instrument": {
+                        "id": "6041563ba1985b38dc6445b6",
+                        "type": "Instrument"
+                    },
+                    "date": "2021-03-03T00:00:00.000Z",
+                    "value": 0.6,
+                    "id": "6041563ba1985b38dc6445bc"
+                  }
+            },
+            "Price": {
+                "description": "A price of a specific type, for a specific instrument on a specific date",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "Id of the price",
+                        "type": "string",
+                        "format": "objectid"
+                    },
+                    "value": {
+                        "description": "The numeric value of one share of the specific instrument",
+                        "type": "number"
+                    },
+                    "type": {
+                        "description": "Type of price",
+                        "type": "string",
+                        "enum": ["Close"]
+                    },
+                    "date": {
+                        "description": "Date of the price",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "instrument": {
+                        "type": "object",
+                        "oneOf": [
+                            {"$ref": "#/components/schemas/Reference"},
+                            {"$ref": "#/components/schemas/Instrument"}
+                        ]
+                    }
+                },
+                "example": {
+                    "value": 203.4,
+                    "type": "Close",
+                    "date": "2021-03-03T00:00:00.000Z",
+                    "instrument": {
+                        "id": "6041563ba1985b38dc6445b6",
+                        "type": "Instrument"
+                    },
+                    "id": "6041563ba1985b38dc6445ba"
+                }
+            },
+            "Reference": {
+                "description": "A reference to another document",
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "description": "Id of the referenced document",
+                        "type": "string"
+                    },
+                    "type": {
+                        "description": "Type of the referenced document",
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

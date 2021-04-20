@@ -1,20 +1,20 @@
-const Position = require('../models/position');
+const Log = require('../models/log');
 
 module.exports = {
 
-    // Query positions
+    // Query logs
     query: function(queryParams, {populate = [], sort = null, limit = null} = {}, callback) {
         if (typeof arguments[1] === 'function') callback = arguments[1];
         
-        return Position.find(queryParams)
+        return Log.find(queryParams)
         .populate(populate)
         .sort(sort)
         .limit(limit)
-        .then(positions => {
+        .then(logs => {
             if (callback) {
-                callback(null, positions);
+                callback(null, logs);
             }
-            return positions;
+            return logs;
         })
         .catch(err => {
             if (callback) {
@@ -25,17 +25,17 @@ module.exports = {
         });
     },
 
-    // Find single position
+    // Find single log record
     findOne: function(queryParams, {populate = []} = {}, callback) {
         if (typeof arguments[1] === 'function') callback = arguments[1];
 
-        return Position.findOne(queryParams)
+        return Log.findOne(queryParams)
         .populate(populate)
-        .then(position => {
+        .then(log => {
             if (callback) {
-                callback(null, position);
+                callback(null, log);
             }
-            return position;
+            return log;
         })
         .catch(err => {
             if (callback) {
@@ -46,14 +46,14 @@ module.exports = {
         });
     },
 
-    // Create a new position
-    create: function(position, callback) {
-        return Position.create(position)
-        .then(position => {
+    // Create a new log record
+    create: function(log, callback) {
+        return Log.create(log)
+        .then(log => {
             if (callback) {
-                callback(null, position);
+                callback(null, log);
             }
-            return position;
+            return log;
         })
         .catch(err => {
             if (callback) {

@@ -9,5 +9,7 @@ const priceSchema = new mongoose.Schema({
 
 priceSchema.index({type: 1, date: 1, instrument: 1}, {unique: true});
 
+priceSchema.plugin(require('./plugins/toJSONTransform'));
+
 module.exports = mongoose.model('Price', priceSchema);
 

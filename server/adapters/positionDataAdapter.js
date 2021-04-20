@@ -1,11 +1,9 @@
 const log4js = require('log4js');
+const logger = log4js.getLogger(require("path").basename(__filename, '.js'));
 const fetch = require('node-fetch');
 const xlsx = require('xlsx');
-const env = require('../environment');
-
 const baseUrl = 'https://www.fi.se/en/our-registers/net-short-positions/';
-var logger = log4js.getLogger('positionDataAdapter');
-logger.level = env.logLevel;
+
 
 class PositionData {
     constructor(data) {
@@ -20,7 +18,7 @@ class PositionData {
 
 async function fetchData(historic = false) {
     let url = baseUrl + (historic ? 'GetHistFile' : 'GetAktuellFile');
-    var wb = xlsx.read(await fetch(url).then(response => response.buffer()), {type:'buffer'});
+    var wb = xlsx.read(await fetch(url).then(response => response.buffer()).catch(error => logger.error(error)), {type:'buffer'});
     var ws = wb.Sheets[wb.SheetNames[0]];
     let positions = xlsx.utils.sheet_to_json(ws, {raw: false, range:6, header: ['holder', 'issuer', 'isin', 'value', 'date', 'comment']});
     return positions.map(position => new PositionData(position));
