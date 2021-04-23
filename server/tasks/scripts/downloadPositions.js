@@ -16,6 +16,7 @@ exports.run = async function(historic=false) {
   let positionsData = await PositionDataAdapter.fetchData(historic=historic);
 
   for (let [i, positionData] of positionsData.entries()) {
+    logger.debug(`Processing row ${i}/${positionsData.length}`);
     try {
       let instrument = await InstrumentFactory.findOne({'identifiers': {$elemMatch: {id: positionData.isin, type: 'Isin'}}});
 
@@ -82,7 +83,7 @@ exports.run = async function(historic=false) {
     } catch(error) {
       logger.error(`Failed to process position on row ${i+6}.`);
       logger.error(positionData);
-      throw(error);
+      logger.error(error);
     }
   }
   logger.info("...processing finished.")

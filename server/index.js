@@ -7,10 +7,12 @@ const scheduler = require('./tasks/scheduler');
 const api = require('./api/api');
 const logger = log4js.getLogger('startup');
 
-async function init() {
-  // Server initialization with retry if mongodb connection fails
+logger.info("### Starting short-list server ###");
+logger.info(`Environment: ${env.environment}`);
+logger.info(`Log level: ${env.logLevel}`);
 
-  logger.info("Connecting to database...");
+async function init() {
+  logger.info(`Connecting to database ${env.dbName}@${env.dbURL}...`);
 
   try {
     await mongoose.connect(
@@ -25,16 +27,21 @@ async function init() {
         pass: env.dbPassword
       }
     );
-    logger.info("Running initial download of positions...");
-    await require('./tasks/scripts/downloadPositions').run(historic=false);
+    
+    if(env.environment == 'prod') {
+      logger.info("Running download of historic positions...");
+      await require('./tasks/scripts/downloadPositions').run(historic=true);
+    }
+    logger.info("Running download of current historic positions...");
+    await require('./tasks/scripts/downloadPositions').run();
 
     logger.info("Scheduling tasks...");
     scheduler.init();
 
-    logger.info("Enabling API...");
+    logger.info(`Enabling API on port: ${env.serverPort}...`);
     api.init();
     
-    logger.info("Startup sequence complete!");
+    logger.info("### Server successfully started ###");
 
   } catch(e) {
     logger.error("Failed to initialize server, ", e);

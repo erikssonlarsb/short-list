@@ -12,5 +12,5 @@ exports.init = function() {
       runOnInit: false
     });
 
-    logger.info("Scheduled script 'downloadPositions'. Next execution: " + downloadPositions.nextDates(3).toString());
+    logger.info("Scheduled script 'downloadPositions'. Next execution: " + downloadPositions.nextDates().toString());
 }
