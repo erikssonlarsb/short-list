@@ -14,7 +14,7 @@
     "http-status-codes": "^2.1.4",
     "log4js": "^6.3.0",
     "mongoose": "^5.11.10",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "pluralize": "^8.0.0",
     "request": "^2.88.2",
     "swagger-ui-express": "^4.1.6",
